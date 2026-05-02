@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.12/brython.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.12/brython_stdlib.js"></script>
+    <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
+</head>
+
+<body onload="brython()">
+
+    <!-- <img src="https://www.aviron-sud-gresivaudan.fr/templates/asg14/images/header.jpg" alt="logo_aviron_sud_gresivaudan.png"></img> -->
+
+
+<h2 style="text-align:center">Observations Hydrométriques (Station W320001002)</h2>
+    source: <a href="https://www.vigicrues.gouv.fr/station/W320001002">Station St-Gervais [DREAL] (Isère)</a>
+    <br>
+    <div style="width: 80%; margin: auto;">
+        <canvas id="hydrometric_data"></canvas>
+    </div>
+    <textarea id="response"> chargement... </textarea>
+
+    <script type="text/python">
+        from browser import document, ajax, window, console
+        import json
+
+        hq = [
+            (0.00, 155),
+            (0.02, 158),
+            (0.04, 161),
+            (0.06, 164),
+            (0.08, 166),
+            (0.10, 169),
+            (0.12, 172),
+            (0.14, 175),
+            (0.16, 178),
+            (0.18, 180),
+            (0.20, 183),
+            (0.22, 186),
+            (0.24, 189),
+            (0.26, 192),
+            (0.28, 195),
+            (0.30, 198),
+            (0.32, 201),
+            (0.34, 204),
+            (0.36, 207),
+            (0.38, 210),
+            (0.40, 213),
+            (0.42, 216),
+            (0.44, 219),
+            (0.46, 222),
+            (0.48, 226),
+            (0.50, 229),
+            (0.52, 232),
+            (0.54, 235),
+            (0.56, 238),
+            (0.58, 242),
+            (0.60, 245),
+            (0.62, 248),
+            (0.64, 252),
+            (0.66, 255),
+            (0.68, 258),
+            (0.70, 262),
+            (0.72, 265),
+            (0.74, 268),
+            (0.76, 272),
+            (0.78, 275),
+            (0.80, 279),
+            (0.82, 282),
+            (0.84, 286),
+            (0.86, 289),
+            (0.88, 293),
+            (0.90, 296),
+            (0.92, 300),
+            (0.94, 304),
+            (0.96, 307),
+            (0.98, 311),
+            (1.00, 315),
+            (1.02, 318),
+            (1.04, 322),
+            (1.06, 326),
+            (1.08, 329),
+            (1.10, 333),
+            (1.12, 337),
+            (1.14, 341),
+            (1.16, 345),
+            (1.18, 348),
+            (1.20, 352),
+            (1.22, 356),
+            (1.24, 360),
+            (1.26, 364),
+            (1.28, 368),
+            (1.30, 372),
+            (1.32, 376),
+            (1.34, 380),
+            (1.36, 384),
+            (1.38, 388),
+            (1.40, 392),
+            (1.42, 396),
+            (1.44, 400),
+            (1.46, 404),
+            (1.48, 408),
+            (1.50, 412),
+            (1.52, 417),
+            (1.54, 421),
+            (1.56, 425),
+            (1.58, 429),
+            (1.60, 434),
+            (1.62, 438),
+            (1.64, 442),
+            (1.66, 446),
+            (1.68, 451),
+            (1.70, 455),
+            (1.72, 459),
+            (1.74, 464),
+            (1.76, 468),
+            (1.78, 472),
+            (1.80, 477),
+            (1.82, 481),
+            (1.84, 486),
+            (1.86, 490),
+            (1.88, 495),
+            (1.90, 499),
+            (1.92, 504),
+            (1.94, 508),
+            (1.96, 513),
+            (1.98, 518),
+            (2.00, 522),
+            (2.02, 527),
+            (2.04, 531),
+            (2.06, 536),
+            (2.08, 541),
+            (2.10, 546),
+            (2.12, 550),
+            (2.14, 555),
+            (2.16, 560),
+            (2.18, 564),
+            (2.20, 569),
+            (2.22, 574),
+            (2.24, 579),
+            (2.26, 584),
+            (2.28, 589),
+            (2.30, 594),
+            (2.32, 598),
+            (2.34, 603),
+            (2.36, 608),
+            (2.38, 613),
+            (2.40, 618),
+            (2.42, 623),
+            (2.44, 628),
+            (2.46, 633),
+            (2.48, 638),
+            (2.50, 643),
+            (2.52, 648),
+            (2.54, 654),
+            (2.56, 659),
+            (2.58, 664),
+            (2.60, 669),
+            (2.62, 674),
+            (2.64, 679),
+            (2.66, 685),
+            (2.68, 690),
+            (2.70, 695),
+            (2.72, 700),
+            (2.74, 706),
+            (2.76, 711),
+            (2.78, 716),
+            (2.80, 721),
+            (2.82, 727),
+            (2.84, 732),
+            (2.86, 738),
+            (2.88, 743),
+            (2.90, 748),
+            (2.92, 754),
+            (2.94, 759),
+            (2.96, 765),
+            (2.98, 770),
+            (3.00, 776),
+            (3.02, 781),
+            (3.04, 787),
+            (3.06, 792),
+            (3.08, 798),
+            (3.10, 804),
+            (3.12, 809),
+            (3.14, 815),
+            (3.16, 821),
+            (3.18, 826),
+            (3.20, 832),
+            (3.22, 838),
+            (3.24, 843),
+            (3.26, 849),
+            (3.28, 855),
+            (3.30, 861),
+            (3.32, 866),
+            (3.34, 872),
+            (3.36, 878),
+            (3.38, 884),
+            (3.40, 890),
+            (3.42, 896),
+            (3.44, 902),
+            (3.46, 907),
+            (3.48, 913),
+            (3.50, 919),
+            (3.52, 925),
+            (3.54, 931),
+            (3.56, 937),
+            (3.58, 943),
+            (3.60, 949),
+            (3.62, 955),
+            (3.64, 961),
+            (3.66, 968),
+            (3.68, 974),
+            (3.70, 980),
+            (3.72, 986),
+            (3.74, 992),
+            (3.76, 998),
+            (3.78, 1004),
+            (3.80, 1011),
+            (3.82, 1017),
+            (3.84, 1023),
+            (3.86, 1029),
+            (3.88, 1036),
+            (3.90, 1042),
+            (3.92, 1048),
+            (3.94, 1055),
+            (3.96, 1061),
+            (3.98, 1067),
+            (4.00, 1074),
+            (4.02, 1080),
+            (4.04, 1087),
+            (4.06, 1093),
+            (4.08, 1099),
+            (4.10, 1106),
+            (4.12, 1112),
+            (4.14, 1119),
+            (4.16, 1125),
+            (4.18, 1132),
+            (4.20, 1138),
+            (4.22, 1145),
+            (4.24, 1152),
+            (4.26, 1158),
+            (4.28, 1165),
+            (4.30, 1171),
+            (4.32, 1178),
+            (4.34, 1185),
+            (4.36, 1191),
+            (4.38, 1198),
+            (4.40, 1205),
+            (4.42, 1212),
+            (4.44, 1218),
+            (4.46, 1225),
+            (4.48, 1232),
+            (4.50, 1239),
+            (4.52, 1246),
+            (4.54, 1252),
+            (4.56, 1259),
+            (4.58, 1266),
+            (4.60, 1273),
+            (4.62, 1280),
+            (4.64, 1287),
+            (4.66, 1294),
+            (4.68, 1301),
+            (4.70, 1308),
+            (4.72, 1315),
+            (4.74, 1322),
+            (4.76, 1329),
+            (4.78, 1336),
+            (4.80, 1343),
+            (4.82, 1350),
+            (4.84, 1357),
+            (4.86, 1364),
+            (4.88, 1371),
+            (4.90, 1378),
+            (4.92, 1386),
+            (4.94, 1393),
+            (4.96, 1400),
+            (4.98, 1407),
+            (5.00, 1414),
+            (5.02, 1422),
+            (5.04, 1429),
+            (5.06, 1436),
+            (5.08, 1443),
+            (5.10, 1451),
+            (5.12, 1458),
+        ]
+        def flow_rate(h_target, h2q):
+            """
+            Calcule le débit interpolé pour une hauteur donnée.
+            Utilise une interpolation linéaire manuelle (produit en croix).
+            
+            Args:
+                h_target: hauteur cible en mètres
+                h2q: liste de tuples (hauteur, débit)
+            
+            Returns:
+                débit interpolé en m3/s
+            """
+            # Cas où h_target est inférieur ou égal à la première valeur
+            if h_target <= h2q[0][0]:
+                return h2q[0][1]
+            
+            # Cas où h_target est supérieur ou égal à la dernière valeur
+            if h_target >= h2q[-1][0]:
+                return h2q[-1][1]
+            
+            # Recherche des indices encadrants et interpolation
+            for i in range(len(h2q) - 1):
+                h_before, q_before = h2q[i]
+                h_after, q_after = h2q[i + 1]
+                
+                # Si h_target est exactement égal à une valeur
+                if h_target == h_before:
+                    return q_before
+                
+                # Si h_target est entre deux valeurs
+                if h_before < h_target < h_after:
+                    # Interpolation linéaire (produit en croix)
+                    q_interpolated = q_before + (h_target - h_before) * (q_after - q_before) / (h_after - h_before)
+                    return q_interpolated
+            
+            # Ne devrait jamais arriver ici
+            return h2q[-1][1]
+
+        console.log(f'hq: {hq}')
+        def on_complete(req):
+            print(f'response status {req.status}')
+            document["response"].text = f"{req.status} {req.text}"
+            if req.status in [200, 206]:
+                data = json.loads(req.text)
+                console.debug(f'response content {data}')
+                observations = data['data']
+                console.log(f'response content {data}')
+                
+                # Extraction des dates et des valeurs (résultats)
+                # On inverse la liste car l'API renvoie souvent du plus récent au plus ancien
+                dates = [obs['date_obs'] for obs in observations][::-1]
+                heights = [obs['resultat_obs']/1000 for obs in observations][::-1]
+                flow_rates = [flow_rate(obs['resultat_obs']/1000, hq) for obs in observations][::-1]
+
+                afficher_graphique(dates, heights, flow_rates)
+            else:
+                document["hydrometric_data"].parent.text = "Erreur lors de la récupération des données."
+
+        def afficher_graphique(labels, heights, flow_rates):
+            Chart = window.Chart.new
+            ctx = document["hydrometric_data"].getContext("2d")
+            console.log(f'heights: {heights[:10]}')
+            console.log(f'flow_rates: {flow_rates[:10]}')
+            
+            # Calculer le max dynamique pour ajuster l'axe y1 et la zone rouge
+            max_flow_rate = max(flow_rates) if flow_rates else 500
+            y1_max = max(max_flow_rate * 1.1, 500)  # Marge de 10%, minimum 500
+            console.log(f'max_flow_rate: {max_flow_rate:.2f}, y1_max ajusté: {y1_max:.2f}')
+            
+            min_flow_rate = min(flow_rates) if flow_rates else 0
+            y1_min = min_flow_rate * 0.9  # Marge de 10%
+            console.log(f'min_flow_rate: {min_flow_rate:.2f}, y1_min ajusté: {y1_min:.2f}')
+            
+            config = {
+                "type": "line",
+                "data": {
+                    "labels": labels,
+                    "datasets": [{
+                        "label": "Hauteur (m)",
+                        "data": heights,
+                        "borderColor": "#007bff",
+                        "borderWidth": 2,
+                        "borderDash": [5, 5],
+                        "pointRadius": 0,
+                        "fill": False,
+                        "yAxisID": "y"
+                    },
+                    {
+                        "label": "Débit (m³/s)",
+                        "data": flow_rates,
+                        "borderColor": "#28a745",
+                        "borderWidth": 3,
+                        "pointRadius": 0,
+                        "fill": False,
+                        "yAxisID": "y1"
+                    }]
+                },
+                "options": {
+                    "responsive": True,
+                    "interaction": {
+                        "mode": "index",
+                        "intersect": False
+                    },
+                    "plugins": {
+                        "annotation": {
+                            "annotations": {
+                                "zone_verte": {
+                                    "type": "box",
+                                    "yScaleID": "y1",
+                                    "yMin": y1_min,
+                                    "yMax": 400,
+                                    "backgroundColor": "rgba(40, 167, 69, 0.15)",
+                                    "borderWidth": 0,
+                                    "drawTime": "beforeDatasetsDraw"
+                                },
+                                "zone_orange": {
+                                    "type": "box",
+                                    "yScaleID": "y1",
+                                    "yMin": 400,
+                                    "yMax": 450,
+                                    "backgroundColor": "rgba(255, 165, 0, 0.2)",
+                                    "borderWidth": 0,
+                                    "drawTime": "beforeDatasetsDraw"
+                                },
+                                "zone_rouge": {
+                                    "type": "box",
+                                    "yScaleID": "y1",
+                                    "yMin": 0,
+                                    "yMax": y1_max,
+                                    "backgroundColor": "rgba(220, 53, 69, 0.15)",
+                                    "borderWidth": 0,
+                                    "drawTime": "beforeDatasetsDraw"
+                                },
+                                "seuil_400": {
+                                    "type": "line",
+                                    "yScaleID": "y1",
+                                    "yMin": 400,
+                                    "yMax": 400,
+                                    "borderColor": "rgba(255, 165, 0, 0.8)",
+                                    "borderWidth": 2,
+                                    "borderDash": [5, 5],
+                                    "label": {
+                                        "display": True,
+                                        "content": "Vigilance (400 m³/s)",
+                                        "position": "end",
+                                        "backgroundColor": "rgba(255, 165, 0, 0.8)",
+                                        "color": "white",
+                                        "font": {
+                                            "size": 10
+                                        }
+                                    }
+                                },
+                                "seuil_450": {
+                                    "type": "line",
+                                    "yScaleID": "y1",
+                                    "yMin": 450,
+                                    "yMax": 450,
+                                    "borderColor": "rgba(220, 53, 69, 0.8)",
+                                    "borderWidth": 2,
+                                    "borderDash": [5, 5],
+                                    "label": {
+                                        "display": True,
+                                        "content": "Alerte (450 m³/s)",
+                                        "position": "end",
+                                        "backgroundColor": "rgba(220, 53, 69, 0.8)",
+                                        "color": "white",
+                                        "font": {
+                                            "size": 10
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "scales": {
+                        "x": { 
+                            "ticks": { "autoSkip": True, "maxTicksLimit": 10 } 
+                        },
+                        "y": {
+                            "type": "linear",
+                            "display": True,
+                            "position": "left",
+                            "title": {
+                                "display": True,
+                                "text": "Hauteur (m)",
+                                "color": "#007bff"
+                            },
+                            "ticks": {
+                                "color": "#007bff"
+                            }
+                        },
+                        "y1": {
+                            "type": "linear",
+                            "display": True,
+                            "position": "right",
+                            "min": y1_min,
+                            "max": y1_max,
+                            "title": {
+                                "display": True,
+                                "text": "Débit (m³/s)",
+                                "color": "#28a745"
+                            },
+                            "ticks": {
+                                "color": "#28a745"
+                            },
+                            "grid": {
+                                "drawOnChartArea": False
+                            }
+                        }
+                    }
+                }
+            }
+            Chart(ctx, config)
+
+        # Configuration de l'appel AJAX
+        url = "https://hubeau.eaufrance.fr/api/v2/hydrometrie/observations_tr"
+        params = (
+            "?code_entite=W320001002"
+            "&size=480"  # Augmenté à 1500 pour le graphique
+            "&pretty"
+            "&grandeur_hydro=H" # On se focalise sur le débit pour cet exemple
+            "&fields=code_station,date_debut_serie,date_fin_serie,date_obs,resultat_obs,continuite_obs_hydro"
+        )
+        console.debug(f'request GET {url}{params}')
+        req = ajax.get(url + params, oncomplete=on_complete)
+    </script>
+</body>
+</html>
