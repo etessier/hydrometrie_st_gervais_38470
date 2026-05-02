@@ -15,13 +15,15 @@
     <!-- <img src="https://www.aviron-sud-gresivaudan.fr/templates/asg14/images/header.jpg" alt="logo_aviron_sud_gresivaudan.png"></img> -->
 
 
-<h2 style="text-align:center">Observations Hydrométriques (Station W320001002)</h2>
-    source: <a href="https://www.vigicrues.gouv.fr/station/W320001002">Station St-Gervais [DREAL] (Isère)</a>
+<h2 style="text-align:center">Observations Hydrométriques (Station St Gervais 38470)</h2>
+    Calcul du débit de l'Isère à partir de la hauteur d'eau mesurée à St-Gervais.
+    <br>
+    Source: <a href="https://www.vigicrues.gouv.fr/station/W320001002">Station St-Gervais [DREAL] (Isère)</a>
     <br>
     <div style="width: 80%; margin: auto;">
         <canvas id="hydrometric_data"></canvas>
     </div>
-    <textarea id="response"> chargement... </textarea>
+    <!-- <textarea id="response"> chargement... </textarea> -->
 
     <script type="text/python">
         from browser import document, ajax, window, console
@@ -327,7 +329,7 @@
         console.log(f'hq: {hq}')
         def on_complete(req):
             print(f'response status {req.status}')
-            document["response"].text = f"{req.status} {req.text}"
+            # document["response"].text = f"{req.status} {req.text}"
             if req.status in [200, 206]:
                 data = json.loads(req.text)
                 console.debug(f'response content {data}')
@@ -468,12 +470,12 @@
                                 "stepSize": 6,
                                 "displayFormats": {
                                     "hour": "HH:mm",
-                                    "day": "DD/MM"
+                                    "day": "dd/MM"
                                 },
-                                "tooltipFormat": "DD/MM/YYYY HH:mm"
+                                "tooltipFormat": "dd/MM/yyyy HH:mm"
                             },
                             "ticks": {
-                                "autoSkip": True,
+                                "maxTicksLimit": 20,
                                 "maxRotation": 45,
                                 "callback": window.Function(
                                     "value", "index", "ticks",
@@ -532,7 +534,7 @@
         url = "https://hubeau.eaufrance.fr/api/v2/hydrometrie/observations_tr"
         params = (
             "?code_entite=W320001002"
-            "&size=1440"  # Augmenté à 1500 pour le graphique
+            "&size=576"  # 2j (période: 5mn)
             "&pretty"
             "&grandeur_hydro=H" # On se focalise sur le débit pour cet exemple
             "&fields=code_station,date_debut_serie,date_fin_serie,date_obs,resultat_obs,continuite_obs_hydro"
