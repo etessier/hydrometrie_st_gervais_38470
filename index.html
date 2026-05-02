@@ -7,6 +7,7 @@
     <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
 </head>
 
 <body onload="brython()">
@@ -366,8 +367,8 @@
                         "label": "Hauteur (m)",
                         "data": heights,
                         "borderColor": "#007bff",
-                        "borderWidth": 2,
-                        "borderDash": [5, 5],
+                        "borderWidth": 1,
+                        "borderDash": [1, 1],
                         "pointRadius": 0,
                         "fill": False,
                         "yAxisID": "y"
@@ -395,7 +396,7 @@
                                     "type": "box",
                                     "yScaleID": "y1",
                                     "yMin": y1_min,
-                                    "yMax": 400,
+                                    "yMax": 450,
                                     "backgroundColor": "rgba(40, 167, 69, 0.15)",
                                     "borderWidth": 0,
                                     "drawTime": "beforeDatasetsDraw"
@@ -403,8 +404,8 @@
                                 "zone_orange": {
                                     "type": "box",
                                     "yScaleID": "y1",
-                                    "yMin": 400,
-                                    "yMax": 450,
+                                    "yMin": 450,
+                                    "yMax": 500,
                                     "backgroundColor": "rgba(255, 165, 0, 0.2)",
                                     "borderWidth": 0,
                                     "drawTime": "beforeDatasetsDraw"
@@ -412,23 +413,23 @@
                                 "zone_rouge": {
                                     "type": "box",
                                     "yScaleID": "y1",
-                                    "yMin": 0,
+                                    "yMin": 500,
                                     "yMax": y1_max,
                                     "backgroundColor": "rgba(220, 53, 69, 0.15)",
                                     "borderWidth": 0,
                                     "drawTime": "beforeDatasetsDraw"
                                 },
-                                "seuil_400": {
+                                "seuil_450": {
                                     "type": "line",
                                     "yScaleID": "y1",
-                                    "yMin": 400,
-                                    "yMax": 400,
+                                    "yMin": 450,
+                                    "yMax": 450,
                                     "borderColor": "rgba(255, 165, 0, 0.8)",
                                     "borderWidth": 2,
                                     "borderDash": [5, 5],
                                     "label": {
                                         "display": True,
-                                        "content": "Vigilance (400 m³/s)",
+                                        "content": "Vigilance (450 m³/s)",
                                         "position": "end",
                                         "backgroundColor": "rgba(255, 165, 0, 0.8)",
                                         "color": "white",
@@ -437,17 +438,17 @@
                                         }
                                     }
                                 },
-                                "seuil_450": {
+                                "seuil_500": {
                                     "type": "line",
                                     "yScaleID": "y1",
-                                    "yMin": 450,
-                                    "yMax": 450,
+                                    "yMin": 500,
+                                    "yMax": 500,
                                     "borderColor": "rgba(220, 53, 69, 0.8)",
                                     "borderWidth": 2,
                                     "borderDash": [5, 5],
                                     "label": {
                                         "display": True,
-                                        "content": "Alerte (450 m³/s)",
+                                        "content": "Alerte (500 m³/s)",
                                         "position": "end",
                                         "backgroundColor": "rgba(220, 53, 69, 0.8)",
                                         "color": "white",
@@ -461,7 +462,35 @@
                     },
                     "scales": {
                         "x": { 
-                            "ticks": { "autoSkip": True, "maxTicksLimit": 10 } 
+                            "type": "time",
+                            "time": {
+                                "unit": "hour",
+                                "stepSize": 6,
+                                "displayFormats": {
+                                    "hour": "HH:mm",
+                                    "day": "DD/MM"
+                                },
+                                "tooltipFormat": "DD/MM/YYYY HH:mm"
+                            },
+                            "ticks": {
+                                "autoSkip": True,
+                                "maxRotation": 45,
+                                "callback": window.Function(
+                                    "value", "index", "ticks",
+                                    """
+                                    const date = new Date(value);
+                                    const prevDate = index > 0 ? new Date(ticks[index - 1].value) : null;
+                                    
+                                    // Si c'est un nouveau jour ou le premier tick
+                                    if (!prevDate || date.getDate() !== prevDate.getDate()) {
+                                        return date.toLocaleDateString('fr-FR') + '\\n' + 
+                                               date.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'});
+                                    }
+                                    // Sinon juste l'heure
+                                    return date.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'});
+                                    """
+                                )
+                            }
                         },
                         "y": {
                             "type": "linear",
@@ -503,7 +532,7 @@
         url = "https://hubeau.eaufrance.fr/api/v2/hydrometrie/observations_tr"
         params = (
             "?code_entite=W320001002"
-            "&size=480"  # Augmenté à 1500 pour le graphique
+            "&size=1440"  # Augmenté à 1500 pour le graphique
             "&pretty"
             "&grandeur_hydro=H" # On se focalise sur le débit pour cet exemple
             "&fields=code_station,date_debut_serie,date_fin_serie,date_obs,resultat_obs,continuite_obs_hydro"
